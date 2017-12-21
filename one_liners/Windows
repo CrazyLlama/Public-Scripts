@@ -1,1 +1,26 @@
+## Sources: 
+# https://www.dionach.com/blog/powershell-in-forensic-investigations
+# https://www.sans.org/reading-room/whitepapers/critical/uncovering-indicators-compromise-ioc-powershell-event-logs-traditional-monitoring-tool-36352
+# https://blogs.technet.microsoft.com/heyscriptingguy/2012/05/28/use-powershell-to-aid-in-security-forensics/
 
+# Lists out all established TCP connections, you can also use netstat to list all connections regardless of status. Make sure you decide whether this is TCP or UDP you want to see and remove the parentheses
+Get-NetTCPConnection –State Established
+netstat -ano -p (TCP/UDP)
+
+# List out all processes running on the server
+Get-Process
+
+# Get more details on a specific process (hint: replace "{process-name}" with the name of the process)
+Get-Process {process-name} | format-list *
+
+# Lists out everything in the Event logs under "Security", "System", and "Application"
+Get-WinEvent -LogName "Security","System","Application"
+
+# Lists out groups under the Domain with their users
+ForEach ($Group in (Get-ADGroup -Filter *)) { Get-ADGroupMember $Group | Select @{Label="Group";Expression={$Group.Name}},Name,SamAccountName }
+
+# Checks for processes set to automatically start on server restart - this is potentially useful for identifying malware/rootkits.
+Get-CimInstance win32_service -Filter "startmode = 'auto'"
+
+# This should get any files on the C drive that have been changed within the last week, you can edit the days to whatever timeframe needed
+Get-ChildItem -Recurse C:\ | ? {$_.lastwritetime -gt (Get-Date).AddDays(-7)}
