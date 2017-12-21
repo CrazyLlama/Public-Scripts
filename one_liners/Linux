@@ -1,1 +1,26 @@
+# Look for potentially bad stuff that's compressed to hide mysterious things - run this within documentroot's of web servers to find potential php shells (source: https://djlab.com/2010/09/finding-php-shell-scripts-and-php-exploits/)
+grep '((eval.*(base64_decode|gzinflate|\$_))|\$[0O]{4,}|FilesMan|JGF1dGhfc|IIIl|die\(PHP_OS|posix_getpwuid|Array\(base64_decode|document\.write\("\\u00|sh(3(ll|11)))' . -lroE --include=*.php*
 
+# Print out processes in a nicer format to compare its shown source to actual source
+ps -Ao pid,comm,cmd,lstart
+
+# Deny those damn pesky processes their CPU time - this is based on all the bad processes being under a single user. Don't run this unless you're sure that 
+pkill -U <user> -STOP || pkill -STOP -U <user> # Depeding on OS
+
+# Deny processes CPU time - this is based on a process by process working order
+kill -STOP <PID>
+
+# Decode and prepend gzip header on a raw file
+base64 -d file.b64 | printf "\x1f\x8b\x08\x00\x00\x00\x00\x00" | cat - /tmp/zlib.raw | gzip -dc > /tmp/out.txt
+
+# Find all writable files/directories in the current directory for the current user - watch out for NFS UID mapping (or root-squashing)
+find . -writable
+
+# One of the following should find access logs (or whatever else you'd like to find) within the server:
+updatedb
+locate access
+find /var/log/* -name "access*"
+
+# And from there you can either grep for strings or read through it manually
+grep "{string}" /path/to/file
+less /path/to/file
