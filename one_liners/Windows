@@ -2,6 +2,7 @@
 # https://www.dionach.com/blog/powershell-in-forensic-investigations
 # https://www.sans.org/reading-room/whitepapers/critical/uncovering-indicators-compromise-ioc-powershell-event-logs-traditional-monitoring-tool-36352
 # https://blogs.technet.microsoft.com/heyscriptingguy/2012/05/28/use-powershell-to-aid-in-security-forensics/
+# https://justinsboringpage.blogspot.co.uk/2009/01/finding-writable-files-in-directory-in.html
 
 # Lists out all established TCP connections, you can also use netstat to list all connections regardless of status. Make sure you decide whether this is TCP or UDP you want to see and remove the parentheses
 Get-NetTCPConnection –State Established
@@ -24,3 +25,9 @@ Get-CimInstance win32_service -Filter "startmode = 'auto'"
 
 # This should get any files on the C drive that have been changed within the last week, you can edit the days to whatever timeframe needed
 Get-ChildItem -Recurse C:\ | ? {$_.lastwritetime -gt (Get-Date).AddDays(-7)}
+
+# Check for writeable files within the current directories
+dir /a-r-d /s /b
+# /a is to search for attributes. In this case r is read only and d is directory. The minus signs negate those attributes. So we're looking for writable files only. 
+# /s means recurse subdirectories
+# /b means bare format. Path and filename only
